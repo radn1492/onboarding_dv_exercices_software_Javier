@@ -1,0 +1,34 @@
+# ROS 2 Humble workspace for onboarding exercises.
+# Does not start the simulator, Mission Control, or the autonomy stack.
+#
+#   docker compose -f docker-compose.onboarding.yml up -d --build
+#   tools/onboarding-ros.sh
+#
+# `/ws/src` is bind-mounted to `onboarding/exercises/` so host edits
+# are live. colcon build/install/log live in named volumes.
+
+name: ifs-onboarding
+
+services:
+  onboarding_ros:
+    build:
+      context: ./docker/onboarding_ros
+      dockerfile: Dockerfile
+    image: ifs-onboarding-ros:humble
+    hostname: onboarding_ros
+    stdin_open: true
+    tty: true
+    working_dir: /ws
+    environment:
+      - ROS_DOMAIN_ID=${ONBOARDING_ROS_DOMAIN_ID:-42}
+    volumes:
+      - ./onboarding/exercises:/ws/src
+      - onboarding_ws_build:/ws/build
+      - onboarding_ws_install:/ws/install
+      - onboarding_ws_log:/ws/log
+    command: ["sleep", "infinity"]
+
+volumes:
+  onboarding_ws_build:
+  onboarding_ws_install:
+  onboarding_ws_log:

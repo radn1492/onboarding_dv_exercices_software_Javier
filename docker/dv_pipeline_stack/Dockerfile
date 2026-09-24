@@ -27,7 +27,8 @@ RUN pip install --no-cache-dir \
     transforms3d \
     matplotlib \
     icecream \
-    typing_extensions
+    typing_extensions \
+    pytest
 
 # FaSTTUBe Formula Student Driverless path planner (PR #243).
 # Installed --no-deps because the package declares numpy>=1.25 while

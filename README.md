@@ -14,6 +14,7 @@ the exercises, fill the gaps in `pipeline/`, then drive with Docker + Mission Co
 | [`pipeline/`](pipeline/) | Full autonomy stack with `STUDENT TODO` gaps |
 | [`ros2/`](ros2/) | `ifssim_bridge` + `sim_supervisor` (talks to the sim binary) |
 | [`docker/`](docker/) + `docker-compose.yml` | Bridge, pipeline, Mission Control, Lichtblick |
+| [`docker-compose.onboarding.yml`](docker-compose.onboarding.yml) | Slim ROS 2 Humble workspace for exercises 01–07 Phase A |
 | [`tools/mission_control/`](tools/mission_control/) | Session UI / API |
 | [`python/ifssim/`](python/ifssim/) | RPC client used by Mission Control |
 

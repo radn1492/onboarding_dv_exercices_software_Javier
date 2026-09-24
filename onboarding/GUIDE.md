@@ -24,6 +24,27 @@ Follow **[SETUP.md](../SETUP.md)**: download a **pre-built IFSSIM release**
 Confirm Mission Control at http://localhost:3000 can start a session against
 the running sim binary.
 
+### ROS / pytest toys (no host ROS)
+
+Exercises **01–03** need ROS 2 Humble + `colcon`. **04–07 Phase A** need
+`pytest` + `numpy`. Do **not** install ROS on the host. A slim image is
+enough — it is **not** the sim stack:
+
+```bash
+# from the repo root
+docker compose -f docker-compose.onboarding.yml up -d --build
+tools/onboarding-ros.sh          # interactive shell, ROS already sourced
+```
+
+Inside that container, `/ws` is a colcon workspace. `/ws/src` is
+bind-mounted to `onboarding/exercises/` on the host, so editor saves
+are live. Open extra terminals with `tools/onboarding-ros.sh` again
+(talker + listener, `ros2 topic echo`, …).
+
+Phase B pipeline tests (`path_planning`, `control`) still run in
+`dv_pipeline_stack` — they need FaSTTUBe and the installed pipeline
+packages. See those sections below.
+
 ---
 
 ## ROS theory (read before the ROS exercises)
@@ -90,7 +111,15 @@ Quality of Service settings control queue depth, reliability, durability. Sensor
 
 [`exercises/01_create_package/`](exercises/01_create_package/) — follow its README.
 
-Fill `package.xml`, `setup.py` entry point, and `hello_node.py`. Build and `ros2 run hello_onboarding hello`.
+Fill `package.xml`, `setup.py` entry point, and `hello_node.py`. Then:
+
+```bash
+tools/onboarding-ros.sh
+cd /ws
+colcon build --symlink-install --packages-select hello_onboarding
+source install/setup.bash
+ros2 run hello_onboarding hello
+```
 
 ---
 
@@ -99,6 +128,15 @@ Fill `package.xml`, `setup.py` entry point, and `hello_node.py`. Build and `ros2
 [`exercises/02_ros_pubsub/`](exercises/02_ros_pubsub/)
 
 Complete the TODOs in `talker.py` and `listener.py` (hints describe *what*, not the exact one-liner).
+
+```bash
+tools/onboarding-ros.sh
+cd /ws
+colcon build --symlink-install --packages-select ros_pubsub_exercise
+source install/setup.bash
+```
+
+Open a second `tools/onboarding-ros.sh` shell:
 
 ```bash
 ros2 run ros_pubsub_exercise talker      # terminal 1
@@ -114,6 +152,14 @@ You should see `hello N` messages. Use `ros2 topic list` / `ros2 topic echo /onb
 [`exercises/03_ros_distance_filter/`](exercises/03_ros_distance_filter/) — see its README.
 
 One node: subscribe to points, always publish distance, forward the point only if it is far enough (`min_range` parameter).
+
+```bash
+tools/onboarding-ros.sh
+cd /ws
+colcon build --symlink-install --packages-select ros_distance_filter
+source install/setup.bash
+ros2 run ros_distance_filter filter
+```
 
 ---
 
@@ -137,9 +183,10 @@ Any three non-colinear points define a plane. You will need that as the **hypoth
 ### Phase A
 
 ```bash
-cd onboarding/exercises/04_plane_from_3_points
-pytest -q
+tools/onboarding-ros.sh bash -lc 'cd /ws/src/04_plane_from_3_points && pytest -q'
 ```
+
+(Or `cd onboarding/exercises/04_plane_from_3_points && pytest -q` on the host if you already have `numpy` + `pytest`.)
 
 Implement `plane_from_points` in `plane.py`.
 
@@ -168,8 +215,7 @@ Why it fits FS LiDAR: most points really are ground → a good plane quickly get
 
 ```bash
 # Finish exercise 04 first (imported by mini RANSAC).
-cd onboarding/exercises/05_mini_ransac
-pytest -q
+tools/onboarding-ros.sh bash -lc 'cd /ws/src/05_mini_ransac && pytest -q'
 ```
 
 ### Phase B
@@ -187,8 +233,7 @@ Leave warm-start, subsample, and adaptive iteration budget alone — read them; 
 ### Phase A
 
 ```bash
-cd onboarding/exercises/06_midpoint_path
-pytest -q
+tools/onboarding-ros.sh bash -lc 'cd /ws/src/06_midpoint_path && pytest -q'
 ```
 
 Implement `world_to_body` and `midpoint_path`. Production planning uses **FaSTTUBe**; midpoints are geometric intuition only.
@@ -201,11 +246,10 @@ Fill TODOs in:
 - [`pipeline/path_planning/path_planning/fasttube_adapter.py`](../pipeline/path_planning/path_planning/fasttube_adapter.py) — `_cull_cones`  
 
 ```bash
-cd pipeline/path_planning
-pytest -q test/test_fasttube_adapter.py
+# needs the sim stack image (FaSTTUBe + installed path_planning)
+docker compose exec dv_pipeline_stack bash -lc \
+  'cd /dv_pipeline_stack_ws/src/path_planning && pytest -q test/test_fasttube_adapter.py'
 ```
-
-(Needs package deps / `fsd_path_planning` as in your usual pipeline test setup.)
 
 ---
 
@@ -235,8 +279,7 @@ We then normalize δ by the max steer angle into `[-1, 1]` for the sim/car inter
 ### Phase A
 
 ```bash
-cd onboarding/exercises/07_pure_pursuit
-pytest -q
+tools/onboarding-ros.sh bash -lc 'cd /ws/src/07_pure_pursuit && pytest -q'
 ```
 
 ### Phase B
@@ -246,8 +289,8 @@ Open [`pipeline/control/control/controllers/pure_pursuit.py`](../pipeline/contro
 Restore the curvature + steer return at the `STUDENT TODO`. Adaptive lookahead above the blank stays as-is.
 
 ```bash
-cd pipeline/control
-pytest -q test/test_pure_pursuit.py
+docker compose exec dv_pipeline_stack bash -lc \
+  'cd /dv_pipeline_stack_ws/src/control && pytest -q test/test_pure_pursuit.py'
 ```
 
 ---

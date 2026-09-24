@@ -75,7 +75,27 @@ if you need it later.
 
 ---
 
-## 5. Start the learning track
+## 5. ROS exercises (no host ROS install)
+
+Exercises 01–03 need ROS 2 Humble + `colcon`. Exercises 04–07 Phase A
+need `pytest` + `numpy`. **Do not install ROS on the host** — use the
+slim onboarding image (separate from the sim stack above):
+
+```bash
+docker compose -f docker-compose.onboarding.yml up -d --build
+tools/onboarding-ros.sh
+```
+
+That shell is a colcon workspace at `/ws` whose `src/` is
+`onboarding/exercises/` on the host. Commands are in
+**[onboarding/GUIDE.md](onboarding/GUIDE.md)**.
+
+Phase B pipeline tests (`path_planning`, `control`) still run inside
+`dv_pipeline_stack` after this repo’s main `docker compose up`.
+
+---
+
+## 6. Start the learning track
 
 → **[onboarding/GUIDE.md](onboarding/GUIDE.md)**
 

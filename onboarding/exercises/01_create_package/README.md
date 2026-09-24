@@ -33,14 +33,16 @@ A package named `hello_onboarding` that:
 2. Open `setup.py` and wire the `console_scripts` entry point to
    `hello_onboarding.hello_node:main`.
 3. Open `hello_node.py` and complete the `HelloNode` class (see TODOs).
-4. Build and run from a ROS 2 sourced shell (or the pipeline Docker image):
+4. Build and run in the onboarding ROS container (do not install ROS on the host):
 
 ```bash
-# From a colcon workspace that contains this folder, e.g. after:
-#   ln -s $(pwd)/onboarding/exercises/01_create_package <ws>/src/hello_onboarding
-# or copy the package into src/
-cd <ws>
-colcon build --packages-select hello_onboarding
+# from the repo root, in a second terminal if the container is already up
+docker compose -f docker-compose.onboarding.yml up -d
+tools/onboarding-ros.sh
+
+# inside the container — /ws/src is this exercises/ tree
+cd /ws
+colcon build --symlink-install --packages-select hello_onboarding
 source install/setup.bash
 ros2 run hello_onboarding hello
 ```

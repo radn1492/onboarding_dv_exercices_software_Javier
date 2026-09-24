@@ -20,6 +20,17 @@ On every incoming point `(x, y, z)`:
 
 ## Run (after filling TODOs)
 
+Use the onboarding ROS container (see [GUIDE.md](../../GUIDE.md)):
+
+```bash
+tools/onboarding-ros.sh
+cd /ws
+colcon build --symlink-install --packages-select ros_distance_filter
+source install/setup.bash
+```
+
+Open extra terminals with `tools/onboarding-ros.sh` again.
+
 ```bash
 # terminal 1
 ros2 run ros_distance_filter filter

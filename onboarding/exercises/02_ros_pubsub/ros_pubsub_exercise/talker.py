@@ -1,6 +1,6 @@
 """Toy ROS 2 talker — fill in the publisher.
 
-Build/run (inside a ROS 2 sourced environment, e.g. the pipeline container).
+Build/run inside the onboarding ROS container (``tools/onboarding-ros.sh``).
 See ``onboarding/GUIDE.md`` § ROS pub/sub.
 """
 from __future__ import annotations
