@@ -17,11 +17,6 @@ setup(
     description="Onboarding hello package",
     license="MIT",
     entry_points={
-        "console_scripts": [
-            # === STUDENT TODO ===
-            # Map executable name "hello" to hello_onboarding.hello_node:main
-            # Format: "exec_name = module.path:function",
-            # === END TODO ===
-        ],
+        "console_scripts": ["hello = hello_onboarding.hello_node:main"],
     },
 )

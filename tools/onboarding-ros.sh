@@ -19,10 +19,11 @@ cd "$ROOT"
 
 if ! "${COMPOSE[@]}" ps --status running --services 2>/dev/null | grep -qx onboarding_ros; then
     echo "→ starting onboarding_ros"
-    "${COMPOSE[@]}" up -d
+    "${COMPOSE[@]}" up -d --build
 fi
-
 if [[ $# -eq 0 ]]; then
+    export MSYS2_ARG_CONV_EXCL="/entrypoint.sh"
     exec "${COMPOSE[@]}" exec onboarding_ros /entrypoint.sh bash
 fi
-exec "${COMPOSE[@]}" exec onboarding_ros /entrypoint.sh "$@"
+export MSYS2_ARG_CONV_EXCL="/entrypoint.sh"
+exec "${COMPOSE[@]}" exec onboarding_ros "$@"
