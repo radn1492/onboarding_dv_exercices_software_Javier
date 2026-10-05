@@ -19,7 +19,10 @@ class DistanceFilter(Node):
         # 3. Create a publisher for Point on "onboarding/point_out".
         # 4. Create a subscription for Point on "onboarding/point_in"
         #    that calls self._on_point.
-        raise NotImplementedError("STUDENT TODO: params + pubs + sub")
+        self._min_range = 1.0
+        self._pub_dist = self.create_publisher(Float64, 'onboarding/distance',10)
+        self._pub_out = self.create_publisher(Point, 'onboarding/point_out',10)
+        self._subscriber = self.create_subscription(Point, 'onboarding/point_in',self._on_point,10)
         # === END TODO ===
 
     def _on_point(self, msg: Point) -> None:
@@ -27,7 +30,15 @@ class DistanceFilter(Node):
         # r = hypot(msg.x, msg.y)
         # Always publish r as Float64 on the distance topic.
         # If r >= self._min_range, also publish the original Point on point_out.
-        raise NotImplementedError("STUDENT TODO: filter callback")
+        hyp = math.hypot(msg.x,msg.y)
+        r = Float64()
+        r.data = hyp
+        self._pub_dist.publish(r)
+        self.get_logger().info(f"Publishing: {r.data}")
+        
+        if r.data >= self._min_range:
+           self._pub_out.publish(msg) 
+
         # === END TODO ===
 
 

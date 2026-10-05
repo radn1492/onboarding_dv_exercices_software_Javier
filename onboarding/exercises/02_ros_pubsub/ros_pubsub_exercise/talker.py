@@ -22,7 +22,8 @@ class Talker(Node):
         # 2. Create a 1.0 second timer whose callback is self._tick
         # Look up create_publisher / create_timer in the rclpy docs or
         # another node in pipeline/ — do not copy from solutions yet.
-        raise NotImplementedError("STUDENT TODO: publisher + timer")
+        self._pub = self.create_publisher(String, 'onboarding/chatter', 10)
+        self.create_timer(1.0, self._tick)
         # === END TODO ===
         self._i = 0
 

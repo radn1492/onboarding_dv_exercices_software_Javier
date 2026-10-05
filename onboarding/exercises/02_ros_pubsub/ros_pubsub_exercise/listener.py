@@ -16,7 +16,7 @@ class Listener(Node):
         #   - calls self._on_msg when a message arrives
         #   - uses queue size 10
         # You do not need to store the subscription handle for this toy.
-        raise NotImplementedError("STUDENT TODO: subscription")
+        self.subscriber_ = self.create_subscription(String, 'onboarding/chatter',self._on_msg,10) 
         # === END TODO ===
 
     def _on_msg(self, msg: String) -> None:
