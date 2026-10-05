@@ -6,6 +6,7 @@ Phase A warm-up for
 from __future__ import annotations
 
 import math
+import numpy as np
 
 
 def compute_steer(
@@ -28,5 +29,10 @@ def compute_steer(
         max_steer: maximum front-wheel angle (rad).
     """
     # === STUDENT TODO ===
-    raise NotImplementedError("STUDENT TODO: compute_steer")
+    try:
+        k=(2*math.sin(alpha))/ld
+    except:
+        raise ZeroDivisionError("ld must be higher than 0")
+    delta = math.atan(wheelbase*k)
+    return float(np.clip(delta/max_steer,-1,1))
     # === END TODO ===
