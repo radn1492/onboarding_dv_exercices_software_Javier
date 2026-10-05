@@ -10,20 +10,11 @@ from pathlib import Path
 
 import numpy as np
 
-# Allow importing the previous exercise without packaging.
-_PLANE_DIR = Path(__file__).resolve().parents[1] / "04_plane_from_3_points"
-if str(_PLANE_DIR) not in sys.path:
-    sys.path.insert(0, str(_PLANE_DIR))
 
 from plane import plane_from_points  # noqa: E402
 
 
-def ransac_plane(
-    points: np.ndarray,
-    threshold: float = 0.05,
-    max_iter: int = 100,
-    rng: np.random.Generator | None = None,
-) -> tuple[np.ndarray, float, np.ndarray]:
+def ransac_plane(points: np.ndarray,threshold: float = 0.05,max_iter: int = 100,rng: np.random.Generator | None = None,) -> tuple[np.ndarray, float, np.ndarray]:
     """Fit a plane with RANSAC.
 
     Args:
@@ -43,6 +34,28 @@ def ransac_plane(
 
     rng = rng or np.random.default_rng()
 
+    best_plane = (None,None,np.ndarray(0))
+
+    for i in range(max_iter):
+
+        point = rng.choice(points,size = 3,replace=False)
+        try:
+            n,d = plane_from_points(point[0],point[1],point[2])
+
+        except ValueError:
+            continue
+        
+        margen = np.dot(points,n) + d
+
+
+        valid = np.abs(margen) < threshold
+
+        if valid.sum() > best_plane[2].sum():
+            best_plane = (n,d,valid) 
+    if best_plane[0] is None:
+        raise RuntimeError
+    
+    return best_plane
     # === STUDENT TODO ===
     # For each iteration:
     #   1. Sample 3 distinct indices.
@@ -51,5 +64,4 @@ def ransac_plane(
     #   4. Keep the (n, d) with the most inliers.
     # After the loop, recompute the inlier mask for the best plane.
     # If no valid hypothesis was found, raise RuntimeError.
-    raise NotImplementedError("STUDENT TODO: ransac_plane")
     # === END TODO ===

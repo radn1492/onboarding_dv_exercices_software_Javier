@@ -25,7 +25,12 @@ def world_to_body(pts_xy: np.ndarray, pose: Pose2D) -> np.ndarray:
     # Translate by -pose.xy, then rotate by -yaw:
     #   body = R(-yaw) @ (world - pose)
     # Empty input should return a copy of the empty array.
-    raise NotImplementedError("STUDENT TODO: world_to_body")
+    s = np.sin(-pose.yaw)
+    c = np.cos(-pose.yaw)
+    rot_matrix = np.array([[c,-s],[s,c]])
+    body = (pts_xy - (pose.x, pose.y)) @ rot_matrix.T
+
+    return body
     # === END TODO ===
 
 
@@ -47,5 +52,18 @@ def midpoint_path(
     # === STUDENT TODO ===
     # Midpoint = 0.5 * (left + right).
     # Yaw[i] = atan2 of (xy[i+1] - xy[i]); yaw[-1] = yaw[-2] if N > 1.
-    raise NotImplementedError("STUDENT TODO: midpoint_path")
+    xy = 0.5*(left_xy + right_xy)
+    yaw = np.zeros(len(left_xy))
+    
+    contador = 0
+    while contador < len(left_xy) - 1:
+        subs = xy[contador + 1] - xy[contador]
+        yaw[contador] = np.arctan2(subs[1],subs[0])
+        
+        contador+=1
+    if len(left_xy)>1:
+        yaw[-1] = yaw[-2]
+
+    return xy,yaw
+
     # === END TODO ===
